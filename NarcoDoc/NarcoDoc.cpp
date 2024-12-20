@@ -43,10 +43,7 @@ public:
     void addTag(const string& tag) { tags.push_back(tag); }
 
     // Открытие файла (базовый метод для всех файлов)
-    virtual void open() const
-    {
-        cout << "Файл " << name << " открыт для редактирования." << endl;
-    }
+    virtual void open() const{}
 
     // Виртуальный метод для получения типа файла (переопределяется в производных классах)
     virtual string getType() const = 0;
@@ -73,6 +70,11 @@ public:
 
     // Переопределенный метод для получения типа файла
     string getType() const override { return "TextDocument"; }
+
+    void open() const override
+    {
+        cout << "Открыт текстовый документ: " << name << endl;
+    }
 };
 
 // Класс PDFDocument для PDF-документов
@@ -84,6 +86,11 @@ public:
 
     // Переопределенный метод для получения типа файла
     string getType() const override { return "PDFDocument"; }
+
+    void open() const override
+    {
+        cout << "Открыт PDF-документ: " << name << endl;
+    }
 };
 
 // Класс ImageFile для изображений
@@ -96,11 +103,12 @@ public:
     // Переопределенный метод для получения типа файла
     string getType() const override { return "ImageFile"; }
 
-    // Метод для предварительного просмотра изображения
-    void preview() const
+    void open() const override
     {
-        cout << "Предварительный просмотр изображения " << name << endl;
+        cout << "Открыто изображения: " << name << endl;
     }
+
+
 };
 
 // Класс VideoFile для видеофайлов
@@ -113,11 +121,12 @@ public:
     // Переопределенный метод для получения типа файла
     string getType() const override { return "VideoFile"; }
 
-    // Метод для предварительного просмотра видео
-    void preview() const
+    void open() const override
     {
-        cout << "Предварительный просмотр видео " << name << endl;
+        cout << "Открыт видеофайл: " << name << endl;
     }
+
+
 };
 
 // Класс AudioFile для аудиофайлов
@@ -130,10 +139,9 @@ public:
     // Переопределенный метод для получения типа файла
     string getType() const override { return "AudioFile"; }
 
-    // Метод для воспроизведения аудиофайла
-    void play() const
+    void open() const override
     {
-        cout << "Воспроизведение аудиофайла " << name << endl;
+        cout << "Открыт аудиофайл: " << name << endl;
     }
 };
 
@@ -230,6 +238,13 @@ public:
         }
     }
 
+    File* getFileByName(const string& name)
+    {
+        auto it = find_if(files.begin(), files.end(), [&](File* f) { return f->getName() == name; });
+        return (it != files.end()) ? *it : nullptr;
+    }
+
+
     // Метод для генерации отчета по найденным файлам
     void generateReport(const vector<File*>& files)
     {
@@ -261,12 +276,13 @@ public:
         string line;
         while (getline(file, line))
         {
-            string name, creationDate, sizeStr, tagsStr;
+            string name, path, creationDate, sizeStr, tagsStr;
             size_t size;
             vector<string> tags;
 
             stringstream ss(line);
             getline(ss, name, ',');
+            getline(ss, path, ',');
             getline(ss, creationDate, ',');
             getline(ss, sizeStr, ',');
             getline(ss, tagsStr);
@@ -299,23 +315,23 @@ public:
             File* newFile = nullptr;
             if (name.find(".pdf") != string::npos)
             {
-                newFile = new PDFDocument(name, "", creationDate, size, tags);
+                newFile = new PDFDocument(name, path, creationDate, size, tags);
             }
             else if (name.find(".jpg") != string::npos)
             {
-                newFile = new ImageFile(name, "", creationDate, size, tags);
+                newFile = new ImageFile(name, path, creationDate, size, tags);
             }
             else if (name.find(".txt") != string::npos)
             {
-                newFile = new TextDocument(name, "", creationDate, size, tags);
+                newFile = new TextDocument(name, path, creationDate, size, tags);
             }
             else if (name.find(".mp4") != string::npos)
             {
-                newFile = new VideoFile(name, "", creationDate, size, tags);
+                newFile = new VideoFile(name, path, creationDate, size, tags);
             }
             else if (name.find(".mp3") != string::npos)
             {
-                newFile = new AudioFile(name, "", creationDate, size, tags);
+                newFile = new AudioFile(name, path, creationDate, size, tags);
             }
 
             if (newFile)
@@ -340,8 +356,8 @@ int main()
     manager.addFile(new PDFDocument("Report.pdf", "C:/Documents", "10.05.2023", 200, { "work", "project" }));
     manager.addFile(new ImageFile("Image.jpg", "C:/Pictures", "15.11.2022", 1500, { "vacation", "family" }));
     manager.addFile(new TextDocument("Notes.txt", "C:/Documents", "01.01.2021", 50, { "work", "personal" }));
-    manager.addFile(new VideoFile("Video.mp4", "C:/Videos", "20.02.2020", 500000, {}));
-    manager.addFile(new AudioFile("Podcast.mp3", "C:/Music", "05.04.2021", 100000, {}));
+    manager.addFile(new VideoFile("Video.mp4", "C:/Videos", "20.02.2020", 500000, { "work" }));
+    manager.addFile(new AudioFile("Podcast.mp3", "C:/Music", "05.04.2021", 100000, { "project" }));
 
     // Основной цикл программы для взаимодействия с пользователем
     while (true)
@@ -407,21 +423,25 @@ int main()
 
         case 2:
         {
-            /*
             string fileName;
             cout << "Введите имя файла для открытия: ";
-            cin >> fileName;
+            cin.ignore(); // Игнорируем символ новой строки, оставшийся после предыдущего ввода
+            getline(cin, fileName);
 
-            auto searchResults = manager.search("", "", 0, SIZE_MAX, "", "", fileName);
-            if (!searchResults.empty()) {
-                searchResults[0]->open();
-            } else 
+            // Используем метод FileManager для поиска файла
+            File* file = manager.getFileByName(fileName);
+
+            if (file)
             {
-                cout << "Файл не найден." << endl;
-            }*/
-            cout << "Тут пока ничего нет";
+                file->open(); // Вызов переопределенного метода open() для соответствующего типа файла
+            }
+            else
+            {
+                cout << "Файл с именем " << fileName << " не найден." << endl;
+            }
             break;
         }
+
 
         case 3:
         {
@@ -511,13 +531,19 @@ int main()
             break;
         }
 
-        case 6: 
+        case 6:
         {
-        
-            cout << "Тут пока ничего нет";
+            string fileName;
+            cout << "Введите путь к текстовому файлу для загрузки данных: ";
+            cin.ignore(); // Игнорируем символ новой строки
+            getline(cin, fileName);
+
+            // Загружаем файлы из указанного текстового файла
+            manager.addFilesFromTextFile(fileName);
+            cout << "Файлы успешно загружены из " << fileName << endl;
             break;
-        
         }
+
 
         case 7:
             return false; // Прерываем выполнение программы

@@ -1,0 +1,5 @@
+file1.pdf,C:/Documents,01.12.2024,350KB,tag1,tag2,tag3
+image1.jpg,C:/Pictures,21.04.2024,2MB,tag1,tag4
+document1.txt,C:/Documents,01.02.2024,1KB,tag5
+video1.mp4,C:/Music,15.12.2024,10MB,tag6,tag7,tag8
+audio1.mp3,C:/Documents,11.05.2024,5MB,tag9,tag10
