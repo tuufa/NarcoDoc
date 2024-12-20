@@ -68,7 +68,6 @@ public:
     TextDocument(const string& name, const string& path, const string& creationDate, size_t size, const vector<string>& tags)
         : File(name, path, creationDate, size, tags) {}
 
-    // Переопределенный метод для получения типа файла
     string getType() const override { return "TextDocument"; }
 
     void open() const override
@@ -84,7 +83,6 @@ public:
     PDFDocument(const string& name, const string& path, const string& creationDate, size_t size, const vector<string>& tags)
         : File(name, path, creationDate, size, tags) {}
 
-    // Переопределенный метод для получения типа файла
     string getType() const override { return "PDFDocument"; }
 
     void open() const override
@@ -100,7 +98,6 @@ public:
     ImageFile(const string& name, const string& path, const string& creationDate, size_t size, const vector<string>& tags)
         : File(name, path, creationDate, size, tags) {}
 
-    // Переопределенный метод для получения типа файла
     string getType() const override { return "ImageFile"; }
 
     void open() const override
@@ -118,7 +115,6 @@ public:
     VideoFile(const string& name, const string& path, const string& creationDate, size_t size, const vector<string>& tags)
         : File(name, path, creationDate, size, tags) {}
 
-    // Переопределенный метод для получения типа файла
     string getType() const override { return "VideoFile"; }
 
     void open() const override
@@ -136,7 +132,6 @@ public:
     AudioFile(const string& name, const string& path, const string& creationDate, size_t size, const vector<string>& tags)
         : File(name, path, creationDate, size, tags) {}
 
-    // Переопределенный метод для получения типа файла
     string getType() const override { return "AudioFile"; }
 
     void open() const override
@@ -382,7 +377,7 @@ int main()
             size_t minSize, maxSize;
 
             cout << "Введите тип файла (оставьте пустым для любого): ";
-            cin.ignore(); // Игнорируем символ новой строки, оставшийся после предыдущего ввода
+            cin.ignore(); 
             getline(cin, type);
 
             cout << "Введите тег (оставьте пустым для любого): ";
@@ -394,7 +389,7 @@ int main()
             cout << "Введите максимальный размер (в KB): ";
             cin >> maxSize;
 
-            cin.ignore(); // Игнорируем символ новой строки, оставшийся после предыдущего ввода
+            cin.ignore(); 
             cout << "Введите дату создания (оставьте пустым для любой): ";
             getline(cin, creationDate);
 
@@ -425,7 +420,7 @@ int main()
         {
             string fileName;
             cout << "Введите имя файла для открытия: ";
-            cin.ignore(); // Игнорируем символ новой строки, оставшийся после предыдущего ввода
+            cin.ignore(); 
             getline(cin, fileName);
 
             // Используем метод FileManager для поиска файла
@@ -433,7 +428,7 @@ int main()
 
             if (file)
             {
-                file->open(); // Вызов переопределенного метода open() для соответствующего типа файла
+                file->open(); 
             }
             else
             {
@@ -470,7 +465,7 @@ int main()
             string type;
 
             cout << "Введите тип файла (txt, pdf, jpg, mp4, mp3): ";
-            cin.ignore(); // Игнорируем символ новой строки, оставшийся после предыдущего ввода
+            cin.ignore();
             getline(cin, type);
 
             cout << "Введите название файла: ";
@@ -486,7 +481,7 @@ int main()
             cin >> size;
 
             cout << "Введите теги (по одному, для завершения введите пустую строку):" << endl;
-            cin.ignore(); // Игнорируем символ новой строки
+            cin.ignore();
             while (true)
             {
                 getline(cin, tag);
@@ -496,7 +491,6 @@ int main()
 
             File* newFile = nullptr;
 
-            // Создаем объект соответствующего производного класса
             if (type == "txt") 
             {
                 newFile = new TextDocument(name, path, creationDate, size, tags);
@@ -535,7 +529,7 @@ int main()
         {
             string fileName;
             cout << "Введите путь к текстовому файлу для загрузки данных: ";
-            cin.ignore(); // Игнорируем символ новой строки
+            cin.ignore(); 
             getline(cin, fileName);
 
             // Загружаем файлы из указанного текстового файла
@@ -546,7 +540,7 @@ int main()
 
 
         case 7:
-            return false; // Прерываем выполнение программы
+            return false; 
 
         default:
             cout << "Неверный выбор, попробуйте снова." << endl;
@@ -558,14 +552,3 @@ int main()
 }
 
 
-
-
-/*
-
-
-    // Установка кодировки консоли для корректного вывода текста на русском языке
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-
-
-*/
